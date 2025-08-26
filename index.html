@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido a la Rifa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 { color: #333; }
+        p { color: #555; line-height: 1.6; }
+        form { display: flex; flex-direction: column; gap: 15px; margin: 20px 0; }
+        label { font-weight: bold; }
+        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 100%; max-width: 300px; }
+        .options { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+        a { display: block; padding: 10px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 4px; }
+        a:hover { background-color: #45a049; }
+        a.disabled { background-color: #cccccc; cursor: not-allowed; pointer-events: none; }
+        @media (max-width: 480px) {
+            .container { padding: 15px; }
+            h1 { font-size: 24px; }
+            a { font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bienvenido a la Rifa Responsiva</h1>
+        <p>¡Configura tu rifa y elige tus números de la suerte! Completa los datos y selecciona el tipo de rifa:</p>
+        <form id="configForm">
+            <label for="responsable">Responsable de la rifa:</label>
+            <input type="text" id="responsable" placeholder="Ej. Juan Pérez" required>
+            <label for="premio">¿Qué se va a rifar?</label>
+            <input type="text" id="premio" placeholder="Ej. $1000 o Televisor" required>
+            <label for="cifras">Tipo de rifa:</label>
+            <select id="cifras">
+                <option value="2">2 cifras (00-99)</option>
+                <option value="3">3 cifras (000-999)</option>
+            </select>
+        </form>
+        <div class="options">
+            <a href="dos.html" id="link2cifras" class="disabled">Rifa dos Cifras</a>
+            <a href="tres.html" id="link3cifras" class="disabled">Rifa tres Cifras</a>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('configForm');
+        const responsableInput = document.getElementById('responsable');
+        const premioInput = document.getElementById('premio');
+        const cifrasSelect = document.getElementById('cifras');
+        const link2cifras = document.getElementById('link2cifras');
+        const link3cifras = document.getElementById('link3cifras');
+
+        // Redirigir automáticamente si hay elección previa
+        window.onload = function() {
+            const cifrasGuardadas = localStorage.getItem('rifaCifras');
+            if (cifrasGuardadas) {
+                if (cifrasGuardadas === '2') {
+                    window.location.href = 'dos.html';
+                } else if (cifrasGuardadas === '3') {
+                    window.location.href = 'tres.html';
+                }
+            }
+        };
+
+        // Habilitar/deshabilitar enlaces según la selección
+        function actualizarEnlaces() {
+            const cifras = cifrasSelect.value;
+            link2cifras.classList.toggle('disabled', cifras !== '2');
+            link3cifras.classList.toggle('disabled', cifras !== '3');
+        }
+
+        // Validar formulario y guardar en localStorage
+        function validarYGuardar() {
+            const responsable = responsableInput.value.trim();
+            const premio = premioInput.value.trim();
+            if (responsable && premio) {
+                localStorage.setItem('rifaResponsable', responsable);
+                localStorage.setItem('rifaPremio', premio);
+                localStorage.setItem('rifaCifras', cifrasSelect.value);
+                actualizarEnlaces();
+            } else {
+                link2cifras.classList.add('disabled');
+                link3cifras.classList.add('disabled');
+            }
+        }
+
+        // Manejar cambios en el formulario
+        form.addEventListener('input', validarYGuardar);
+        cifrasSelect.addEventListener('change', validarYGuardar);
+
+        // Manejar enlaces
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                if (!link.classList.contains('disabled')) {
+                    const href = link.getAttribute('href');
+                    console.log('Navegando a: ' + href); // Para depuración
+                    window.location.href = href;
+                } else {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Validar al cargar la página
+        validarYGuardar();
+    </script>
+</body>
+</html>
